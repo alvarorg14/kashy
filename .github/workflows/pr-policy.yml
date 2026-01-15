@@ -12,8 +12,6 @@ jobs:
   check-labels:
     name: Check labels (Kashy policy)
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
     steps:
       - name: Require a type:* label
         uses: yogevbd/enforce-label-action@2.2.2
