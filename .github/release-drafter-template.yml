@@ -64,9 +64,4 @@ include-contributors: true
 change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
 
 template: |
-  ## Changes
-
   $CHANGES
-
-  ## Contributors
-  $CONTRIBUTORS
