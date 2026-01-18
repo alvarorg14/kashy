@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":semanticCommitType(chore)",
+    ":semanticCommitScope(deps)",
+    "helpers:pinGitHubActionDigests",
+    "workarounds:all"
+  ],
+
+  "labels": ["dependencies", "type: maintenance", "area: build"],
+
+  "dependencyDashboardTitle": "Renovate Dependency Dashboard",
+  "dependencyDashboardLabels": ["dependencies"],
+
+  "timezone": "Europe/Madrid",
+  "schedule": ["before 06:00 on Monday"],
+  "prConcurrentLimit": 5
+}
