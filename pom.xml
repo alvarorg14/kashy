@@ -1,73 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.0.1</version>
+    <relativePath/>
+    <!-- lookup parent from repository -->
+  </parent>
 
-	<groupId>io.github.alvarorg14</groupId>
-	<artifactId>kashy</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>kashy</name>
-	<description>Personal finance app powered by AI</description>
-	<url>https://github.com/alvarorg14/kashy</url>
+  <groupId>io.github.alvarorg14</groupId>
+  <artifactId>kashy</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>kashy</name>
+  <description>Personal finance app powered by AI</description>
+  <url>https://github.com/alvarorg14/kashy</url>
 
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
-	<developers>
-		<developer>
-			<name>alvarorg14</name>
-			<url>https://github.com/alvarorg14</url>
-		</developer>
-	</developers>
-	<scm>
-		<connection>scm:git:git://github.com/alvarorg14/kashy.git</connection>
-		<developerConnection>scm:git:ssh://github.com/alvarorg14/kashy.git</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://github.com/alvarorg14/kashy</url>
-	</scm>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>alvarorg14</name>
+      <url>https://github.com/alvarorg14</url>
+    </developer>
+  </developers>
 
-	<properties>
-		<java.version>25</java.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
+  <modules>
+    <module>kashy-api</module>
+  </modules>
+  <scm>
+    <connection>scm:git:git://github.com/alvarorg14/kashy.git</connection>
+    <developerConnection>scm:git:ssh://github.com/alvarorg14/kashy.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/alvarorg14/kashy</url>
+  </scm>
 
-	<modules>
-		<module>kashy-api</module>
-	</modules>
+  <properties>
+    <java.version>25</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <spotless.version>3.1.0</spotless.version>
+  </properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter</artifactId>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-test</artifactId>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-	
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-maven-plugin</artifactId>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless.version}</version>
+          <configuration>
+            <java>
+              <googleJavaFormat/>
+              <removeUnusedImports/>
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
+            </java>
+            <pom>
+              <sortPom/>
+            </pom>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>
