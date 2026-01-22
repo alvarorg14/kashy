@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.github.alvarorg14</groupId>
     <artifactId>kashy</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>kashy-api</artifactId>
