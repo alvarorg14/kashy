@@ -1,0 +1,78 @@
+name: CI - Main
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  spotless:
+    name: Spotless Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java + Maven
+        uses: ./.github/actions/setup-java-maven
+
+      - name: Run Spotless check
+        run: mvn -B -ntp spotless:check
+
+  test:
+    name: Unit & Integration Tests
+    needs: spotless
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java + Maven
+        uses: ./.github/actions/setup-java-maven
+
+      - name: Run tests with coverage
+        run: mvn -B -ntp verify
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            **/target/site/jacoco/**
+            **/target/jacoco.exec
+          retention-days: 1
+
+  sonar:
+    name: SonarCloud Analysis
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java + Maven
+        uses: ./.github/actions/setup-java-maven
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+
+      - name: Run SonarCloud analysis
+        run: mvn -B -ntp sonar:sonar
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
