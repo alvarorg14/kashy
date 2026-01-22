@@ -1,0 +1,32 @@
+name: "Setup Java + Maven cache"
+description: "Sets up a JDK (Temurin by default) and enables Maven dependency caching"
+
+inputs:
+  java-version:
+    description: "JDK version to install"
+    required: false
+    default: "25"
+  distribution:
+    description: "JDK distribution (e.g., temurin, zulu, corretto)"
+    required: false
+    default: "temurin"
+  cache-dependency-path:
+    description: "Path(s) used to compute Maven cache key (supports glob patterns)"
+    required: false
+    default: "**/pom.xml"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: ${{ inputs.distribution }}
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles(inputs.cache-dependency-path) }}
+        restore-keys: ${{ runner.os }}-m2
