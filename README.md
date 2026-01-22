@@ -1,10 +1,11 @@
 # Kashy
 
+[![CI](https://github.com/alvarorg14/kashy/actions/workflows/ci-main.yaml/badge.svg)](https://github.com/alvarorg14/kashy/actions/workflows/ci-main.yaml)
+[![GitHub Release](https://img.shields.io/github/v/release/alvarorg14/kashy?include_prereleases&sort=semver)](https://github.com/alvarorg14/kashy/releases)
 [![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.1-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![GitHub Release](https://img.shields.io/github/v/release/alvarorg14/kashy?include_prereleases&sort=semver)](https://github.com/alvarorg14/kashy/releases)
-[![GitHub Issues](https://img.shields.io/github/issues/alvarorg14/kashy)](https://github.com/alvarorg14/kashy/issues)
 [![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen?logo=renovatebot)](https://github.com/renovatebot/renovate)
 [![Spotless](https://img.shields.io/badge/code%20style-spotless-ff69b4.svg)](https://github.com/diffplug/spotless)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
