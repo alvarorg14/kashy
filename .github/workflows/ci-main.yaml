@@ -72,7 +72,9 @@ jobs:
           name: coverage-reports
 
       - name: Run SonarCloud analysis
-        run: mvn -B -ntp sonar:sonar
+        run: >
+          mvn -B -ntp sonar:sonar
+          -Dsonar.branch.name=${{ github.ref_name }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
