@@ -6,6 +6,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/alvarorg14/kashy?include_prereleases&sort=semver)](https://github.com/alvarorg14/kashy/releases)
 [![GitHub Issues](https://img.shields.io/github/issues/alvarorg14/kashy)](https://github.com/alvarorg14/kashy/issues)
 [![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen?logo=renovatebot)](https://github.com/renovatebot/renovate)
+[![Spotless](https://img.shields.io/badge/code%20style-spotless-ff69b4.svg)](https://github.com/diffplug/spotless)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 Kashy is a personal finance management application powered by AI, designed to help you take control of your financial life.
