@@ -14,19 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Require a type:* label
-        uses: yogevbd/enforce-label-action@2.2.2
+        uses: yogevbd/enforce-label-action@a3c219da6b8fa73f6ba62b68ff09c469b3a1c024 # 2.2.2
         with:
           REQUIRED_LABELS_ANY: "type: feature,type: bug,type: enhancement,type: documentation,type: refactor,type: maintenance,type: security"
           REQUIRED_LABELS_ANY_DESCRIPTION: "Add exactly one type:* label (required): type: feature | type: bug | type: enhancement | type: documentation | type: refactor | type: maintenance | type: security"
 
       - name: Require an area:* label
-        uses: yogevbd/enforce-label-action@2.2.2
+        uses: yogevbd/enforce-label-action@a3c219da6b8fa73f6ba62b68ff09c469b3a1c024 # 2.2.2
         with:
           REQUIRED_LABELS_ANY: "area: api,area: agent,area: messaging,area: shared,area: infra,area: docs,area: build"
           REQUIRED_LABELS_ANY_DESCRIPTION: "Add at least one area:* label (required): area: api | area: agent | area: messaging | area: shared | area: infra | area: docs | area: build"
 
       - name: Ban status:* labels on PRs (issues only)
-        uses: yogevbd/enforce-label-action@2.2.2
+        uses: yogevbd/enforce-label-action@a3c219da6b8fa73f6ba62b68ff09c469b3a1c024 # 2.2.2
         with:
           BANNED_LABELS: "status: triage,status: needs info,status: blocked,status: ready,status: in progress,status: stalled"
           BANNED_LABELS_DESCRIPTION: "Do not use status:* labels on PRs (issues only). Remove the status label(s) from this PR."
