@@ -1,10 +1,10 @@
 ---
-description: Java 25 + Spring Boot 4 reactive-first development guidelines for the Kashy project
+description: Java 25 + Spring Boot 4 virtual-thread-first development guidelines for the Kashy project
 globs: ["**/*.java"]
 alwaysApply: true
 ---
 
-# Java 25 + Spring Boot 4 Reactive Development Rules
+# Java 25 + Spring Boot 4 Virtual-Thread-First Development Rules
 
 ## Tone & Goals
 
@@ -24,14 +24,25 @@ alwaysApply: true
 
 Spring Boot 4 builds on **Spring Framework 7**, providing modularization, JSpecify null-safety, and first-class Java 25 support.
 
-- Use **Spring WebFlux** as the default web stack (not Spring MVC)
+- Use **Spring MVC (Servlet stack)** as the default web stack (not Spring WebFlux)
 - Prefer **functional endpoint routing** (`RouterFunction`) for simple APIs; use `@RestController` for complex ones
 - Configure with `application.yaml`; use **Spring Boot's type-safe configuration** (`@ConfigurationProperties` with records)
 - Use **constructor injection** exclusively; avoid `@Autowired` on fields
 - Leverage **Spring Boot's auto-configuration**; override only when necessary
-- For data access, prefer **Spring Data R2DBC** or reactive MongoDB drivers
-- Use **Spring Security's reactive support** (`@EnableWebFluxSecurity`)
-- Prefer **declarative HTTP clients** (`@HttpExchange` interfaces) over manual `WebClient` setup
+- For data access, prefer **Spring Data JDBC/JPA** (blocking drivers are expected)
+- Use **Spring Security (Servlet)** configuration (not reactive security)
+- Prefer **declarative HTTP clients** (`@HttpExchange` interfaces) over manual client setup
+- Outbound HTTP:
+  - Prefer `RestClient` / `@HttpExchange` for straightforward calls
+  - Use `WebClient` only when you need streaming APIs or advanced HTTP features
+
+## Virtual Threads (Default Concurrency Model)
+
+- Use **virtual threads** as the default request-execution model.
+- Enable virtual threads via configuration:
+  - `spring.threads.virtual.enabled=true`
+- Write normal blocking code for IO (DB/HTTP/files) without reactive wrappers.
+- Do not create custom platform-thread pools unless you have a proven need.
 
 ## API-First Development
 
@@ -43,26 +54,31 @@ Spring Boot 4 builds on **Spring Framework 7**, providing modularization, JSpeci
 - Document breaking vs non-breaking changes; maintain changelog per API version
 - Consumer-driven contracts: consider **Spring Cloud Contract** or **Pact** for integration testing
 
-## Functional & Reactive Style
+## Functional Style (Imperative IO, Functional Core)
 
 - Strive for **pure functions**: avoid side effects and shared mutable state
-- Use immutable collections and defensive copies. No public mutators
-- Favor **reactive programming** (Project Reactor / WebFlux):
-  - Compose with `Mono` and `Flux` instead of blocking APIs
-  - Use operators (`map`, `flatMap`, `filter`, etc.) to express transformations
-  - Ensure pipelines remain short and intention-revealing
+- Use immutable collections and defensive copies. No public mutators.
+- Favor **functional composition** in the domain layer:
+  - Express transformations with `map`, `filter`, `collect`, `reduce`
+  - Keep IO at the boundaries (controllers, repositories, gateways)
 - Use `Optional` only as a **return type** to represent absence; never for fields, parameters, or collections
 - Error strategy:
-  - For exceptional states, signal via reactive error channels (`Mono.error` / `Flux.error`)
-  - For recoverable cases, prefer explicit result types or fallback operators
+  - For exceptional states, throw domain exceptions with precise messages
+  - For recoverable cases, prefer explicit result types (sealed hierarchies) over exceptions
+  - Map low-level exceptions to domain-level ones at service boundaries
 
 ## Concurrency & Performance
 
-- **Reactive-first**: do not block threads. Delegate all IO to reactive drivers (e.g., R2DBC, reactive Mongo)
-- Avoid mixing reactive and imperative concurrency unless strictly necessary
-- Use **Schedulers** for controlled parallelism; clearly mark boundaries where you switch execution contexts
-- Ensure backpressure is respected; avoid unbounded buffering
-- Minimize shared state; if unavoidable, encapsulate with clear synchronization or concurrency-safe structures
+- **Virtual-thread-first**: blocking IO is allowed and expected; keep it at the boundaries.
+- Prefer **structured concurrency** for fan-out / parallel IO:
+  - Use `StructuredTaskScope` for parallel calls with clear failure/timeout semantics
+  - Avoid ad-hoc thread creation; never use `new Thread(...)`
+- Bound concurrency intentionally:
+  - DB connection pools and HTTP connection pools are the real limiters—size and timeouts matter
+  - Do not assume virtual threads remove backpressure needs; enforce limits with bulkheads/timeouts
+- Avoid pinning:
+  - Minimize `synchronized` blocks and long-held locks
+  - Avoid blocking while holding locks
 - Measure before optimizing; document proven hotspots and chosen remedies
 
 ## API Design & Error Handling
@@ -72,7 +88,7 @@ Spring Boot 4 builds on **Spring Framework 7**, providing modularization, JSpeci
   - Threading/immutability guarantees
   - Nullability and error semantics
 - Fail fast with precise messages; no silent catch-and-ignore
-- Map low-level exceptions to domain-level ones at reactive boundaries
+- Translate low-level exceptions to domain-level ones at service boundaries
 - Keep DTOs small and stable (prefer records). Don't leak internals
 
 ## Logging
@@ -89,7 +105,9 @@ Spring Boot 4 builds on **Spring Framework 7**, providing modularization, JSpeci
 
 - Use **JUnit 5** with parameterized tests where valuable
 - Name tests clearly using Given/When/Then pattern
-- For reactive flows, test with **StepVerifier** or equivalent
+- Prefer:
+  - `MockMvc` for MVC slice tests
+  - `@SpringBootTest` for integration tests where necessary
 - Test observable behavior, not internals. Avoid fragile timing-based tests
 - Add property-based tests when they improve confidence
 
@@ -97,7 +115,7 @@ Spring Boot 4 builds on **Spring Framework 7**, providing modularization, JSpeci
 
 - Organize packages by **domain/module**; keep internals `package-private` where possible
 - Standard Java naming/formatting; one public top-level type per file; small classes and methods
-- Prefer the standard library and reactive ecosystem
+- Prefer the standard library and Spring ecosystem
 - Add dependencies only with a clear, documented payoff and wrap behind interfaces
 - Do not use FQN; include imports for new references in classes
 
@@ -113,11 +131,11 @@ Spring Boot 4 builds on **Spring Framework 7**, providing modularization, JSpeci
 
 - No excessive annotations, builders, or boilerplate where a `record` suffices
 - No premature abstraction; prefer straightforward solutions with strong names
-- No mixing blocking IO with reactive flows
+- No reactive-first constraints (no requirement for `Mono`/`Flux`, backpressure operators, or reactive drivers)
 
 ## Definition of Done
 
 - Compiles on **Java 25** with **Spring Boot 4**
-- Follows this rule set (immutability, functional-first, reactive-first concurrency)
+- Follows this rule set (immutability, functional-first, virtual-thread-first concurrency)
 - Clear, minimal documentation where it matters
-- Tests cover critical reactive paths and contracts
+- Tests cover critical paths and contracts
