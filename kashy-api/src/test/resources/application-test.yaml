@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: ${POSTGRESQL_URL:jdbc:postgresql://localhost:5432/kashy}
+    username: ${POSTGRESQL_USERNAME:kashy}
+    password: ${POSTGRESQL_PASSWORD:kashy}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
