@@ -73,7 +73,7 @@ jobs:
 
       - name: Run SonarCloud analysis
         run: >
-          mvn -B -ntp sonar:sonar
+          mvn -B -ntp compile sonar:sonar
           -Drevision=${{ github.sha }}
           -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
           -Dsonar.pullrequest.branch=${{ github.head_ref }}
