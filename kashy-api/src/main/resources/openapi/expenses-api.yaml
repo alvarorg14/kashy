@@ -1,0 +1,446 @@
+openapi: 3.0.3
+
+info:
+  title: Kashy Expenses API
+  description: |
+    Kashy Expenses API provides expense management capabilities for personal finance tracking.
+    This API allows users to create and retrieve expense records with detailed categorization
+    and metadata.
+    
+    **Key Features:**
+    - Expense Creation: Create expense records with description, amount, currency, category, and optional notes
+    - Expense Listing: Retrieve all expenses with full details including timestamps
+    - Category Management: Organize expenses using predefined categories (Food, Transport, Housing, etc.)
+    - Currency Support: Track expenses in any ISO 4217 currency code (EUR, USD, etc.)
+    - Audit Trail: Automatic tracking of creation and update timestamps
+    
+    **What this API does NOT do (v1):**
+    - Expense updates or deletion (v2)
+    - Filtering and pagination (v2)
+    - Expense search (v2)
+    - Multi-user support (v2)
+    - Expense analytics and reporting (v2)
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+security: []
+
+tags:
+  - name: Expenses
+    description: |
+      Expense management endpoints for creating and retrieving expense records.
+      Expenses represent financial transactions with detailed categorization and metadata.
+
+paths:
+  /api/v1/expenses:
+    post:
+      tags:
+        - Expenses
+      summary: Create a new expense
+      description: |
+        Creates a new expense record in the system.
+        
+        **Creation Process:**
+        1. Validates the request payload (required fields, data types, constraints)
+        2. Generates a unique UUID for the expense
+        3. Sets creation and update timestamps to current time
+        4. Persists the expense to the database
+        5. Returns the created expense with all fields populated
+        
+        **Response:**
+        Returns (201 Created) with the complete expense record including:
+        - Generated UUID identifier
+        - All provided expense details
+        - Creation and update timestamps
+        
+        **Error Handling:**
+        - 400: Invalid request parameters (missing required fields, invalid data types, validation failures)
+        - 500: Internal server error during expense creation
+        
+        **Validation Rules:**
+        - Description: Required, max 255 characters
+        - DateTime: Required, must be a valid ISO-8601 date-time
+        - Amount: Required, must be non-negative decimal number
+        - Currency: Required, must be a valid 3-character ISO 4217 code (e.g., EUR, USD)
+        - Category: Required, must be one of the predefined categories
+        - Notes: Optional, no length restriction
+      operationId: createExpense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseRequest'
+            example:
+              description: Grocery shopping
+              dateTime: '2024-01-15T10:30:00Z'
+              amount: 45.99
+              currency: EUR
+              category: FOOD
+              notes: Weekly groceries from supermarket
+      responses:
+        '201':
+          description: Expense created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateExpenseResponse'
+              example:
+                data:
+                  id: '550e8400-e29b-41d4-a716-446655440000'
+                  description: Grocery shopping
+                  dateTime: '2024-01-15T10:30:00Z'
+                  amount: 45.99
+                  currency: EUR
+                  category: FOOD
+                  notes: Weekly groceries from supermarket
+                  createdAt: '2024-01-15T10:30:00Z'
+                  updatedAt: '2024-01-15T10:30:00Z'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    get:
+      tags:
+        - Expenses
+      summary: List all expenses
+      description: |
+        Retrieves a list of all expense records in the system.
+        
+        **Returns:**
+        - Complete list of all expenses
+        - Each expense includes full details (id, description, amount, currency, category, notes, timestamps)
+        - Expenses are returned in creation order (newest first)
+        
+        **Use Cases:**
+        - View all expenses for financial overview
+        - Access expense history
+        - Retrieve expense details for analysis
+        
+        **Error Handling:**
+        - 500: Internal server error during retrieval
+        
+        **Note:** This endpoint returns all expenses without pagination. For large datasets,
+        pagination and filtering will be available in v2.
+      operationId: listExpenses
+      responses:
+        '200':
+          description: List of expenses retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListExpensesResponse'
+              example:
+                data:
+                  - id: '550e8400-e29b-41d4-a716-446655440000'
+                    description: Grocery shopping
+                    dateTime: '2024-01-15T10:30:00Z'
+                    amount: 45.99
+                    currency: EUR
+                    category: FOOD
+                    notes: Weekly groceries from supermarket
+                    createdAt: '2024-01-15T10:30:00Z'
+                    updatedAt: '2024-01-15T10:30:00Z'
+                  - id: '660e8400-e29b-41d4-a716-446655440001'
+                    description: Bus ticket
+                    dateTime: '2024-01-14T08:15:00Z'
+                    amount: 2.50
+                    currency: EUR
+                    category: TRANSPORT
+                    notes: null
+                    createdAt: '2024-01-14T08:15:00Z'
+                    updatedAt: '2024-01-14T08:15:00Z'
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/X-Correlation-Id'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  schemas:
+    CreateExpenseRequest:
+      type: object
+      required:
+        - description
+        - dateTime
+        - amount
+        - currency
+        - category
+      properties:
+        description:
+          type: string
+          description: Brief description of the expense
+          maxLength: 255
+          example: Grocery shopping
+        dateTime:
+          type: string
+          format: date-time
+          description: ISO-8601 formatted date-time when the expense occurred
+          example: '2024-01-15T10:30:00Z'
+        amount:
+          type: number
+          format: decimal
+          description: Monetary amount of the expense. Must be non-negative.
+          minimum: 0
+          example: 45.99
+        currency:
+          type: string
+          description: ISO 4217 currency code (3 uppercase letters)
+          pattern: '^[A-Z]{3}$'
+          example: EUR
+        category:
+          $ref: '#/components/schemas/Category'
+        notes:
+          type: string
+          description: Optional extended description or additional notes about the expense
+          nullable: true
+          example: Weekly groceries from supermarket
+
+    ExpenseResponse:
+      type: object
+      required:
+        - id
+        - description
+        - dateTime
+        - amount
+        - currency
+        - category
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the expense
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        description:
+          type: string
+          description: Brief description of the expense
+          example: Grocery shopping
+        dateTime:
+          type: string
+          format: date-time
+          description: ISO-8601 formatted date-time when the expense occurred
+          example: '2024-01-15T10:30:00Z'
+        amount:
+          type: number
+          format: decimal
+          description: Monetary amount of the expense
+          example: 45.99
+        currency:
+          type: string
+          description: ISO 4217 currency code
+          example: EUR
+        category:
+          $ref: '#/components/schemas/Category'
+        notes:
+          type: string
+          description: Extended description or additional notes about the expense
+          nullable: true
+          example: Weekly groceries from supermarket
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO-8601 formatted timestamp when the expense was created
+          example: '2024-01-15T10:30:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 formatted timestamp when the expense was last updated
+          example: '2024-01-15T10:30:00Z'
+
+    CreateExpenseResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/ExpenseResponse'
+          description: The created expense
+
+    ListExpensesResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseResponse'
+          description: List of expenses
+
+    Category:
+      type: string
+      enum:
+        - FOOD
+        - TRANSPORT
+        - HOUSING
+        - UTILITIES
+        - ENTERTAINMENT
+        - HEALTHCARE
+        - SHOPPING
+        - EDUCATION
+        - TRAVEL
+        - OTHER
+      description: Expense category classification
+      example: FOOD
+
+    ErrorResponse:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorModel'
+          description: |
+            List of error details describing what went wrong. Multiple errors may be returned
+            when validation fails for multiple fields or when multiple issues occur during processing.
+          example:
+            - code: 'VALIDATION_ERROR'
+              reason: 'Description cannot be null or blank. Please provide a valid description.'
+              datetime:
+                value: '2024-01-15T10:30:45.123'
+                timezone: 'UTC'
+              rootCauses:
+                - code: 'FIELD_VALIDATION_FAILED'
+                  reason: "Field 'description' failed validation: value is null or empty"
+                  datetime:
+                    value: '2024-01-15T10:30:45.120'
+                    timezone: 'UTC'
+
+    ErrorModel:
+      type: object
+      required:
+        - code
+        - reason
+        - datetime
+      properties:
+        rootCauses:
+          type: array
+          items:
+            $ref: '#/components/schemas/RootCause'
+          description: |
+            Optional array of underlying root causes that led to this error. Provides detailed
+            technical information for debugging purposes.
+          example:
+            - code: 'DATABASE_CONNECTION_ERROR'
+              reason: 'Failed to connect to database: Connection timeout after 30 seconds'
+              datetime:
+                value: '2024-01-15T10:30:45.123'
+                timezone: 'UTC'
+        code:
+          type: string
+          description: Service-generated error code identifying the type of error
+          example: 'VALIDATION_ERROR'
+        reason:
+          type: string
+          description: Human-readable error description and suggested action
+          example: 'Description cannot be null or blank. Please provide a valid description.'
+        datetime:
+          $ref: '#/components/schemas/datetime'
+
+    RootCause:
+      type: object
+      required:
+        - code
+        - reason
+        - datetime
+      properties:
+        code:
+          type: string
+          description: The service-generated error code identifying the root cause
+          example: 'DATABASE_CONNECTION_ERROR'
+        reason:
+          type: string
+          description: Detailed description of the root cause error and any action(s) to take
+          example: 'Failed to connect to database: Connection timeout after 30 seconds. Check database connectivity and configuration.'
+        datetime:
+          $ref: '#/components/schemas/datetime'
+
+    datetime:
+      type: object
+      description: |
+        Date and time representation with timezone information. Follows ISO-8601 format
+        for the value field.
+      required:
+        - value
+        - timezone
+      properties:
+        value:
+          type: string
+          format: date-time
+          description: |
+            ISO-8601 formatted date and time string (without timezone suffix, as timezone
+            is specified separately)
+          example: '2024-01-15T10:30:45.123'
+        timezone:
+          type: string
+          description: |
+            IANA timezone identifier (e.g., UTC, America/New_York) or UTC offset
+            (e.g., +00:00)
+          example: 'UTC'
+
+  headers:
+    X-Correlation-Id:
+      description: Used to enable tracing through the call stack
+      schema:
+        type: string
+        format: uuid
+        example: '2db833ca-d336-4eac-8ef8-b136233f6b3f'
+      required: true
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters (missing required fields, invalid data types, validation failures)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            errors:
+              - code: 'VALIDATION_ERROR'
+                reason: 'Description cannot be null or blank. Please provide a valid description.'
+                datetime:
+                  value: '2024-01-15T10:30:45.123'
+                  timezone: 'UTC'
+                rootCauses:
+                  - code: 'FIELD_VALIDATION_FAILED'
+                    reason: "Field 'description' failed validation: value is null or empty"
+                    datetime:
+                      value: '2024-01-15T10:30:45.120'
+                      timezone: 'UTC'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            errors:
+              - code: 'INTERNAL_SERVER_ERROR'
+                reason: 'An unexpected error occurred while processing your request. Please try again later.'
+                datetime:
+                  value: '2024-01-15T10:30:45.123'
+                  timezone: 'UTC'
+                rootCauses:
+                  - code: 'DATABASE_CONNECTION_ERROR'
+                    reason: 'Failed to connect to database: Connection timeout after 30 seconds'
+                    datetime:
+                      value: '2024-01-15T10:30:45.120'
+                      timezone: 'UTC'
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/X-Correlation-Id'
