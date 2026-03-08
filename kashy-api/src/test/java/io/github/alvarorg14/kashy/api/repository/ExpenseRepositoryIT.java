@@ -115,6 +115,25 @@ class ExpenseRepositoryIT extends AbstractIT {
   }
 
   @Test
+  @DisplayName(
+      "Given multiple expenses when findAllByOrderByCreatedAtDesc then expenses are sorted newest first")
+  void
+      given_multipleExpenses_when_findAllByOrderByCreatedAtDesc_then_expensesAreSortedNewestFirst() {
+    // Given
+    repository.save(testEntity1);
+    repository.save(testEntity2);
+
+    // When
+    List<ExpenseEntity> sorted = repository.findAllByOrderByCreatedAtDesc();
+
+    // Then
+    assertEquals(2, sorted.size());
+    assertEquals("Bus ticket", sorted.get(0).getDescription());
+    assertEquals("Grocery shopping", sorted.get(1).getDescription());
+    assertTrue(sorted.get(0).getCreatedAt().isAfter(sorted.get(1).getCreatedAt()));
+  }
+
+  @Test
   @DisplayName("Given saved expense when update then expense is updated")
   void given_savedExpense_when_update_then_expenseIsUpdated() {
     // Given
