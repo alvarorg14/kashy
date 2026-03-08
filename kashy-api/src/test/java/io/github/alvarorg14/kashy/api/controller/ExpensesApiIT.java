@@ -254,6 +254,27 @@ class ExpensesApiIT extends AbstractIT {
 
     @Test
     @DisplayName(
+        "Given multiple expenses, when listing expenses, then returns expenses sorted by createdAt descending")
+    void givenMultipleExpenses_whenListingExpenses_thenReturnsExpensesSortedByCreatedAtDesc() {
+      createExpense("First expense", "10.00", "FOOD");
+      createExpense("Second expense", "20.00", "TRANSPORT");
+      createExpense("Third expense", "30.00", "ENTERTAINMENT");
+
+      given()
+          .contentType(ContentType.JSON)
+          .when()
+          .get(EXPENSES_BASE_PATH)
+          .then()
+          .statusCode(200)
+          .contentType(ContentType.JSON)
+          .body("data", hasSize(3))
+          .body("data[0].description", equalTo("Third expense"))
+          .body("data[1].description", equalTo("Second expense"))
+          .body("data[2].description", equalTo("First expense"));
+    }
+
+    @Test
+    @DisplayName(
         "Given expense was just created, when listing expenses, then returns the created expense with correct data")
     void givenExpenseWasJustCreated_whenListingExpenses_thenReturnsCreatedExpenseWithCorrectData() {
       String createdExpenseId = createExpenseAndGetId("Coffee", "4.50", "FOOD", "Morning coffee");

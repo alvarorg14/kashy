@@ -132,7 +132,7 @@ class ExpenseServiceTest {
             .updatedAt(entity2.getUpdatedAt())
             .build();
 
-    when(repository.findAll()).thenReturn(List.of(testEntity, entity2));
+    when(repository.findAllByOrderByCreatedAtDesc()).thenReturn(List.of(entity2, testEntity));
     when(mapper.toDomain(testEntity)).thenReturn(testExpense);
     when(mapper.toDomain(entity2)).thenReturn(expense2);
 
@@ -141,8 +141,8 @@ class ExpenseServiceTest {
 
     // Then
     assertEquals(2, result.size());
-    assertEquals("Test expense", result.get(0).description());
-    assertEquals("Second expense", result.get(1).description());
-    verify(repository).findAll();
+    assertEquals("Second expense", result.get(0).description());
+    assertEquals("Test expense", result.get(1).description());
+    verify(repository).findAllByOrderByCreatedAtDesc();
   }
 }
