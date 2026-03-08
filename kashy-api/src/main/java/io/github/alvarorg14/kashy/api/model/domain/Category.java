@@ -12,6 +12,7 @@ public enum Category {
   UTILITIES,
   ENTERTAINMENT,
   HEALTHCARE,
+  PETS,
   SHOPPING,
   EDUCATION,
   TRAVEL,

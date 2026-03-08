@@ -169,8 +169,17 @@ class ExpensesApiIT extends AbstractIT {
         "Given expense request with all categories, when creating expense, then returns 201 for each valid category")
     void givenExpenseRequestWithDifferentCategories_whenCreatingExpense_thenReturns201() {
       String[] categories = {
-        "FOOD", "TRANSPORT", "HOUSING", "UTILITIES", "ENTERTAINMENT",
-        "HEALTHCARE", "SHOPPING", "EDUCATION", "TRAVEL", "OTHER"
+        "FOOD",
+        "TRANSPORT",
+        "HOUSING",
+        "UTILITIES",
+        "ENTERTAINMENT",
+        "HEALTHCARE",
+        "PETS",
+        "SHOPPING",
+        "EDUCATION",
+        "TRAVEL",
+        "OTHER"
       };
 
       for (String category : categories) {
