@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-limit-notes-length
+      author: kashy
+      changes:
+        - sql:
+            sql: UPDATE expenses SET notes = LEFT(notes, 500) WHERE LENGTH(notes) > 500
+        - modifyDataType:
+            tableName: expenses
+            columnName: notes
+            newDataType: varchar(500)
