@@ -55,6 +55,6 @@ public class ExpenseServiceImpl implements ExpenseService {
   @Transactional(readOnly = true)
   public List<Expense> listExpenses() {
     log.debug("Retrieving all expenses");
-    return repository.findAll().stream().map(mapper::toDomain).toList();
+    return repository.findAllByOrderByCreatedAtDesc().stream().map(mapper::toDomain).toList();
   }
 }

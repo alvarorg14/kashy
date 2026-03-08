@@ -1,6 +1,7 @@
 package io.github.alvarorg14.kashy.api.repository;
 
 import io.github.alvarorg14.kashy.api.model.entity.ExpenseEntity;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,4 +13,7 @@ import org.springframework.stereotype.Repository;
  * methods can be added here as needed.
  */
 @Repository
-public interface ExpenseRepository extends JpaRepository<ExpenseEntity, UUID> {}
+public interface ExpenseRepository extends JpaRepository<ExpenseEntity, UUID> {
+
+  List<ExpenseEntity> findAllByOrderByCreatedAtDesc();
+}
