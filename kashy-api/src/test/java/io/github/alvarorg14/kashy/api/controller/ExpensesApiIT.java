@@ -161,7 +161,49 @@ class ExpensesApiIT extends AbstractIT {
                 "currency": "EUR",
                 "category": "INVALID_CATEGORY"
               }
-              """));
+              """),
+          Arguments.of(
+              "notes exceeding 500 characters",
+              """
+              {
+                "description": "Grocery shopping",
+                "dateTime": "2024-01-15T10:30:00Z",
+                "amount": 45.99,
+                "currency": "EUR",
+                "category": "FOOD",
+                "notes": "%s"
+              }
+              """
+                  .formatted("a".repeat(501))));
+    }
+
+    @Test
+    @DisplayName(
+        "Given expense request with notes at exactly 500 characters, when creating expense, then returns 201")
+    void givenNotesAtExactly500Characters_whenCreatingExpense_thenReturns201() {
+      String notes500 = "a".repeat(500);
+      String requestBody =
+          """
+          {
+            "description": "Grocery shopping",
+            "dateTime": "2024-01-15T10:30:00Z",
+            "amount": 45.99,
+            "currency": "EUR",
+            "category": "FOOD",
+            "notes": "%s"
+          }
+          """
+              .formatted(notes500);
+
+      given()
+          .contentType(ContentType.JSON)
+          .body(requestBody)
+          .when()
+          .post(EXPENSES_BASE_PATH)
+          .then()
+          .statusCode(201)
+          .contentType(ContentType.JSON)
+          .body("data.notes", equalTo(notes500));
     }
 
     @Test
