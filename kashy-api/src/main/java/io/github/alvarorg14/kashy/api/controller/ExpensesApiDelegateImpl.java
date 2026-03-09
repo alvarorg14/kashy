@@ -37,7 +37,7 @@ public class ExpensesApiDelegateImpl implements ExpensesApiDelegate {
     CreateExpenseResponse response = new CreateExpenseResponse();
     response.setData(expenseResponse);
 
-    log.info("Created expense with id: {}", createdExpense.id());
+    log.debug("Created expense with id: {}", createdExpense.id());
     return response;
   }
 
