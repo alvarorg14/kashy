@@ -52,7 +52,7 @@ public class ExpenseEntity {
   @Column(name = "category", nullable = false, length = 50)
   private Category category;
 
-  @Column(name = "notes", columnDefinition = "TEXT")
+  @Column(name = "notes", length = 500)
   private String notes;
 
   @Column(name = "created_at", nullable = false, updatable = false)

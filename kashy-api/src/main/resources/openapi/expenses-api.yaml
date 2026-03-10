@@ -66,7 +66,7 @@ paths:
         - Amount: Required, must be non-negative decimal number
         - Currency: Required, must be a valid 3-character ISO 4217 code (e.g., EUR, USD)
         - Category: Required, must be one of the predefined categories
-        - Notes: Optional, no length restriction
+        - Notes: Optional, max 500 characters
       operationId: createExpense
       requestBody:
         required: true
@@ -201,6 +201,7 @@ components:
           type: string
           description: Optional extended description or additional notes about the expense
           nullable: true
+          maxLength: 500
           example: Weekly groceries from supermarket
 
     ExpenseResponse:
